@@ -1,130 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who's That Pokémon?</title>
-  <link rel="icon" href="https://iconmonstr.com/wp-content/g/gd/makefg.php?i=../releases/preview/2012/png/iconmonstr-help-2.png&r=107&g=184&b=255" type="image/png">
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@2.36.1/dist/full.css" rel="stylesheet" type="text/css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<style>[x-cloak] { display: none !important }</style>
-<body
-  class="min-h-screen"
-  x-data="{
-    alerts: [],
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Who's That Pokémon?</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/dream-world/poke-ball.png" type="image/png" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.5.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </head>
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+  </style>
+  <body
+    class="h-screen p-4 flex sm:items-center justify-center"
+    x-data="{
+      alerts: [],
 
-    pokemons: [],
-    hearts: 5,
+      pokemons: [],
+      hearts: 5,
 
-    currentPokemon: 0,
-    guesses: [],
-    result: null,
+      currentPokemon: 0,
+      guesses: [],
+      result: null,
 
-    start() {
-      this.guesses = [];
-      this.currentPokemon = Math.floor(Math.random() * this.pokemons.length) + 1;
-      this.result = null;
-    },
-    guess(name) {
-      name = name.trim().toLowerCase();
-      if(name === '') return;
-      if(!this.pokemons.includes(name)) {
-        this.alerts.push(`There is no Pokémon named like that!`);
-        return;
-      }
-      if(this.pokemons.indexOf(name) === this.currentPokemon - 1) {
-        this.result = 1;
-        return;
-      }
-      this.guesses.push(name)
-      if(this.guesses.length === this.hearts) this.result = 0;
-    },
-  }"
-  x-init="
-    pokemons = (await (await fetch('https://pokeapi.co/api/v2/pokemon-species/?limit=9999')).json())
-               .results.map(pokemon => pokemon.name);
-    start();
-    $watch('result', () => alerts = []);
-  "
-  x-cloak
->
-
-<div class="hero">
-  <div class="hero-content w-full max-w-3xl flex-col sm:flex-row items-stretch gap-8 sm:gap-16">
-    <div class="w-full flex flex-col items-center justify-center gap-4">
-      <img
-        class="w-64 aspect-square sm:w-full max-w-sx sm:max-w-sm"
-        :class="result === null ? ['blur-none', 'blur-sm', 'blur', 'blur-md', 'blur-lg', 'blur-xl'][hearts - guesses.length] : ''"
-        :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${currentPokemon}.png`"
-      >
-      <div class="flex">
-        <template x-for="heart in hearts" :key="heart">
-          <svg class="w-6 h-6" :class="(heart <= hearts - guesses.length) ? 'text-secondary' : 'text-base-300'" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
-        </template>
+      start() {
+        this.guesses = [];
+        this.currentPokemon = Math.floor(Math.random() * this.pokemons.length) + 1;
+        this.result = null;
+      },
+      guess(name) {
+        name = name.trim().toLowerCase();
+        if(name === '') return;
+        if(!this.pokemons.includes(name)) {
+          this.alerts.push(`Invalid Pokémon!`);
+          return;
+        }
+        if(this.pokemons.indexOf(name) === this.currentPokemon - 1) {
+          this.result = 1;
+          return;
+        }
+        this.guesses.push(name)
+        if(this.guesses.length === this.hearts) this.result = 0;
+      },
+    }"
+    x-init="
+      pokemons = (await (await fetch('https://pokeapi.co/api/v2/pokemon-species/?limit=9999')).json())
+                 .results.map(pokemon => pokemon.name);
+      start();
+      $watch('result', () => alerts = []);
+    "
+    x-cloak
+  >
+    <div class="w-full max-w-3xl flex flex-col sm:flex-row items-stretch gap-8 sm:gap-16">
+      <div class="w-full flex flex-col items-center justify-center gap-8">
+        <img
+          class="w-64 aspect-square sm:w-full max-w-sx sm:max-w-sm"
+          :class="result === null ? ['blur-none', 'blur-sm', 'blur', 'blur-md', 'blur-lg', 'blur-xl'][hearts - guesses.length] : ''"
+          :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${currentPokemon}.png`"
+        />
+        <div class="flex">
+          <template x-for="heart in hearts" :key="heart">
+            <svg
+              class="w-6 h-6"
+              :class="(heart <= hearts - guesses.length) ? 'text-secondary' : 'text-base-300'"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </template>
+        </div>
       </div>
-    </div>
-    <div class="w-full flex flex-col justify-end gap-4">
-      <template x-for="(guess, guessIndex) in guesses" :key="guessIndex">
-        <p class="px-4 py-2 rounded-lg bg-base-200">
-          It's not <span class="capitalize" x-text="guess"></span>.
-        </p>
-      </template>
-      <datalist id="pokemons">
-        <template x-for="pokemon in pokemons" :key="pokemon">
-          <option :value="pokemon">
+
+      <div class="w-full flex flex-col justify-end gap-4">
+        <template x-for="(guess, guessIndex) in guesses" :key="guessIndex">
+          <p class="px-6 py-3 rounded-lg bg-base-200">It's not <span class="capitalize" x-text="guess"></span>.</p>
         </template>
-      </datalist>
-      <div x-show="result === null" class="input-group" x-data="{ currentGuess: '' }">
-        <input
-          type="text"
-          list="pokemons"
-          class="input input-bordered w-full capitalize bg-base-200"
-          x-model="currentGuess"
-          @keyup.enter="guess(currentGuess); currentGuess = ''"
-        >
-        <button
-          class="btn btn-square btn-primary"
-          @click="guess(currentGuess); currentGuess = ''"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </button>
-      </div>
-      <div x-show="result !== null" class="input-group" @click="start()">
-        <span
-          class="w-full"
-          :class="result === 1 ? 'text-primary-content bg-primary capitalize' : 'text-secondary-content bg-secondary'"
-          x-text="result === 1 ? `It's ${pokemons[currentPokemon - 1]}!` : 'Game over...'"
-        ></span>
-        <div
-          class="tooltip"
-          :class="result === 1 ? 'tooltip-primary' : 'tooltip-secondary'"
-          :data-tip="result === 1 ? 'Replay' : 'Retry'"
-        >
-          <button
-            class="btn btn-square"
-            :class="result === 1 ? 'btn-primary ' : 'btn-secondary'"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <datalist id="pokemons">
+          <template x-for="pokemon in pokemons" :key="pokemon"> <option :value="pokemon"></option></template>
+        </datalist>
+        <div x-show="result === null" class="join" x-data="{ currentGuess: '' }">
+          <input
+            type="text"
+            list="pokemons"
+            class="join-item input input-bordered w-full capitalize bg-base-200"
+            x-model="currentGuess"
+            @keyup.enter="guess(currentGuess); currentGuess = ''"
+          />
+          <button class="join-item btn btn-square btn-primary" @click="guess(currentGuess); currentGuess = ''">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
           </button>
+        </div>
+        <div x-show="result !== null" class="join" @click="start()">
+          <span
+            class="join-item btn flex-1"
+            :class="result === 1 ? 'btn-primary capitalize' : 'btn-secondary'"
+            x-text="result === 1 ? `It's ${pokemons[currentPokemon - 1]}!` : 'Game over...'"
+          ></span>
+          <div class="join-item tooltip" :class="result === 1 ? 'tooltip-primary' : 'tooltip-secondary'" :data-tip="result === 1 ? 'Replay' : 'Retry'">
+            <button class="btn btn-square rounded-l-none" :class="result === 1 ? 'btn-primary ' : 'btn-secondary'">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="toast">
-  <template x-for="(alert, alertIndex) in alerts" :key="alertIndex">
-    <div class="alert alert-warning" @click="alerts.splice(alertIndex, 1)">
-      <div>
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        <span x-text="alert"></span>
-      </div>
+    <div class="toast toast-end">
+      <template x-for="(alert, alertIndex) in alerts" :key="alertIndex">
+        <div role="alert" class="alert alert-warning flex flex-row" @click="alerts.splice(alertIndex, 1)">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <span x-text="alert"></span>
+        </div>
+      </template>
     </div>
-  </template>
-</div>
-
-</body>
+  </body>
 </html>
